@@ -86,8 +86,8 @@ impl Task for EncodeTask<'static> {
 }
 
 pub enum DecodeTask {
-    Single(Tokenizer, Vec<u32>, bool),
-    Batch(Tokenizer, Vec<Vec<u32>>, bool),
+    Single(Tokenizer, Vec<u32>, bool, bool, bool),
+    Batch(Tokenizer, Vec<Vec<u32>>, bool, bool, bool),
 }
 
 pub enum DecodeOutput {
@@ -102,18 +102,40 @@ impl Task for DecodeTask {
 
     fn perform(&self) -> Result<Self::Output, Self::Error> {
         match self {
-            DecodeTask::Single(worker, ids, skip_special_tokens) => worker
+            DecodeTask::Single(
+                worker,
+                ids,
+                skip_special_tokens,
+                clean_up_tokenization_spaces,
+                spaces_between_added_tokens,
+            ) => worker
                 .tokenizer
                 .read()
                 .unwrap()
-                .decode(ids.to_vec(), *skip_special_tokens)
+                .decode(
+                    ids.to_vec(),
+                    *skip_special_tokens,
+                    *clean_up_tokenization_spaces,
+                    *spaces_between_added_tokens,
+                )
                 .map_err(|e| format!("{}", e))
                 .map(DecodeOutput::Single),
-            DecodeTask::Batch(worker, ids, skip_special_tokens) => worker
+            DecodeTask::Batch(
+                worker,
+                ids,
+                skip_special_tokens,
+                clean_up_tokenization_spaces,
+                spaces_between_added_tokens,
+            ) => worker
                 .tokenizer
                 .read()
                 .unwrap()
-                .decode_batch(ids.to_vec(), *skip_special_tokens)
+                .decode_batch(
+                    ids.to_vec(),
+                    *skip_special_tokens,
+                    *clean_up_tokenization_spaces,
+                    *spaces_between_added_tokens,
+                )
                 .map_err(|e| format!("{}", e))
                 .map(DecodeOutput::Batch),
         }

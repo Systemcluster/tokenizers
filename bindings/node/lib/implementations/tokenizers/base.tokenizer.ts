@@ -123,10 +123,15 @@ export class BaseTokenizer<TConfig extends object> {
    *
    * @param ids A list of ids to be decoded
    * @param [skipSpecialTokens=true] Whether to remove all the special tokens from the output string
+   * @param [spacesBetweenAddedTokens=true] Whether an extra space (" ") should be prepended to special tokens
    */
-  decode(ids: number[], skipSpecialTokens = true): Promise<string> {
+  decode(
+    ids: number[],
+    skipSpecialTokens = true,
+    spacesBetweenAddedTokens = true
+  ): Promise<string> {
     const decode = promisify(this.tokenizer.decode.bind(this.tokenizer));
-    return decode(ids, skipSpecialTokens);
+    return decode(ids, skipSpecialTokens, spacesBetweenAddedTokens);
   }
 
   /**
@@ -134,10 +139,15 @@ export class BaseTokenizer<TConfig extends object> {
    *
    * @param sequences A list of sequences of ids to be decoded
    * @param [skipSpecialTokens=true] Whether to remove all the special tokens from the output strings
+   * @param [spacesBetweenAddedTokens=true] Whether an extra space (" ") should be prepended to special tokens
    */
-  decodeBatch(ids: number[][], skipSpecialTokens = true): Promise<string[]> {
+  decodeBatch(
+    ids: number[][],
+    skipSpecialTokens = true,
+    spacesBetweenAddedTokens = true
+  ): Promise<string[]> {
     const decodeBatch = promisify(this.tokenizer.decodeBatch.bind(this.tokenizer));
-    return decodeBatch(ids, skipSpecialTokens);
+    return decodeBatch(ids, skipSpecialTokens, spacesBetweenAddedTokens);
   }
 
   /**

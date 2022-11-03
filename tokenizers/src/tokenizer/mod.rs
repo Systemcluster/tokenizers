@@ -626,6 +626,22 @@ where
         self.padding.as_mut()
     }
 
+    /// Cleanup tokenzation spaces when needed.
+    fn clean_up_tokenization(&self, out_string: String) -> String {
+        let mut cleaned_string = out_string;
+        cleaned_string = cleaned_string.replace(" .", ".");
+        cleaned_string = cleaned_string.replace(" ?", "?");
+        cleaned_string = cleaned_string.replace(" !", "!");
+        cleaned_string = cleaned_string.replace(" ,", ",");
+        cleaned_string = cleaned_string.replace(" ' ", "'");
+        cleaned_string = cleaned_string.replace(" n't", "n't");
+        cleaned_string = cleaned_string.replace(" 'm", "'m");
+        cleaned_string = cleaned_string.replace(" 's", "'s");
+        cleaned_string = cleaned_string.replace(" 've", "'ve");
+        cleaned_string = cleaned_string.replace(" 're", "'re");
+        cleaned_string
+    }
+
     /// Get the vocabulary
     pub fn get_vocab(&self, with_added_tokens: bool) -> HashMap<String, u32> {
         let mut final_vocab = self.model.get_vocab();
@@ -795,22 +811,60 @@ where
     }
 
     /// Decode the given ids, back to a String
-    pub fn decode(&self, ids: Vec<u32>, skip_special_tokens: bool) -> Result<String> {
-        let tokens = ids
-            .into_iter()
-            .filter_map(|id| {
-                self.added_vocabulary
-                    .id_to_token(id, &self.model)
-                    .filter(|token| {
-                        !skip_special_tokens || !self.added_vocabulary.is_special_token(token)
-                    })
-            })
-            .collect::<Vec<_>>();
+    pub fn decode(
+        &self,
+        ids: Vec<u32>,
+        skip_special_tokens: bool,
+        clean_up_tokenization_spaces: bool,
+        spaces_between_added_tokens: bool,
+    ) -> Result<String> {
+        // split on added_tokens
+
+        let mut sub_texts: Vec<String> = Vec::new();
+        let mut current_sub_text = String::new();
+
+        for id in &ids {
+            if let Some(token) = self.added_vocabulary.id_to_token(*id, &self.model) {
+                let is_special_token = self.added_vocabulary.is_special_token(&token);
+                if !skip_special_tokens || !is_special_token {
+                    let added_tokens_encoder = self.added_vocabulary.get_added_tokens_encoder();
+                    if added_tokens_encoder.contains(&token) {
+                        if !current_sub_text.is_empty() {
+                            sub_texts.push(current_sub_text.clone());
+                            current_sub_text.clear();
+                        }
+                        sub_texts.push(token.to_string());
+                    } else {
+                        if !current_sub_text.is_empty() {
+                            current_sub_text.push(' ');
+                        }
+                        current_sub_text.push_str(&token);
+                    }
+                }
+            }
+        }
+        if !current_sub_text.is_empty() {
+            sub_texts.push(current_sub_text);
+        }
+        let sub_texts_concatenated = if spaces_between_added_tokens {
+            sub_texts.join(" ")
+        } else {
+            sub_texts.join("")
+        };
+
+        let tokens = sub_texts_concatenated
+            .split(' ')
+            .map(|s| s.to_string())
+            .collect();
 
         if let Some(decoder) = &self.decoder {
             decoder.decode(tokens)
         } else {
-            Ok(tokens.join(" "))
+            Ok(if clean_up_tokenization_spaces {
+                self.clean_up_tokenization(sub_texts_concatenated)
+            } else {
+                sub_texts_concatenated
+            })
         }
     }
 }
@@ -1010,13 +1064,22 @@ where
         &self,
         sentences: Vec<Vec<u32>>,
         skip_special_tokens: bool,
+        clean_up_tokenization_spaces: bool,
+        spaces_between_added_tokens: bool,
     ) -> Result<Vec<String>>
     where
         M: Send + Sync,
     {
         sentences
             .into_maybe_par_iter()
-            .map(|sentence| self.decode(sentence, skip_special_tokens))
+            .map(|sentence| {
+                self.decode(
+                    sentence,
+                    skip_special_tokens,
+                    clean_up_tokenization_spaces,
+                    spaces_between_added_tokens,
+                )
+            })
             .collect()
     }
 
