@@ -2,13 +2,13 @@ pub(crate) mod cache;
 #[cfg(feature = "http")]
 pub(crate) mod from_pretrained;
 
-#[cfg(feature = "unstable_wasm")]
+#[cfg(any(feature = "unstable_wasm", feature = "unstable_wasi"))]
 mod fancy;
-#[cfg(feature = "unstable_wasm")]
+#[cfg(any(feature = "unstable_wasm", feature = "unstable_wasi"))]
 pub use fancy::SysRegex;
-#[cfg(not(feature = "unstable_wasm"))]
+#[cfg(not(any(feature = "unstable_wasm", feature = "unstable_wasi")))]
 mod onig;
-#[cfg(not(feature = "unstable_wasm"))]
+#[cfg(not(any(feature = "unstable_wasm", feature = "unstable_wasi")))]
 pub use crate::utils::onig::SysRegex;
 
 pub mod iter;

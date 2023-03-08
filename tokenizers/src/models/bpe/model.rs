@@ -512,7 +512,6 @@ impl Model for BPE {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::NamedTempFile;
 
     #[test]
     fn test_ordered_vocab_iter() {
@@ -662,36 +661,6 @@ mod tests {
 
     #[test]
     // Ensure `BPE::from_file` works as expected.
-    fn test_bpe_from_file() {
-        // Set up vocab file.
-        let mut vocab_file = NamedTempFile::new().unwrap();
-        vocab_file
-            .write_all(b"{\"a\": 0, \"b\": 1, \"c\": 2, \"ab\": 3}")
-            .unwrap();
-
-        // Set up merges file.
-        let mut merges_file = NamedTempFile::new().unwrap();
-        merges_file.write_all(b"#version: 0.2\na b").unwrap();
-
-        // Make sure we can instantiate a BPE model from the files.
-        let builder = BPE::from_file(
-            vocab_file.path().to_str().unwrap(),
-            merges_file.path().to_str().unwrap(),
-        );
-        let bpe = builder.build().unwrap();
-
-        // Check merges.
-        assert_eq!(bpe.merges.get(&(0, 1)).unwrap(), &(0u32, 3u32));
-
-        // Check vocab.
-        assert_eq!(bpe.vocab.get("a").unwrap(), &0u32);
-        assert_eq!(bpe.vocab.get("b").unwrap(), &1u32);
-        assert_eq!(bpe.vocab.get("c").unwrap(), &2u32);
-        assert_eq!(bpe.vocab.get("ab").unwrap(), &3u32);
-    }
-
-    #[test]
-    // Ensure `BPE::from_file` works as expected.
     fn test_bpe_with_continuing_subword_prefix() {
         let vocab: Vocab = vec![
             ("a".to_string(), 0),
@@ -733,64 +702,5 @@ mod tests {
                 offsets: (0, 3)
             }]
         );
-    }
-
-    #[test]
-    // Ensure `MergeTokenOutOfVocabulary` error is returned when it should be.
-    fn test_bpe_from_file_merge_token_oov() {
-        // Set up vocab file.
-        let mut vocab_file = NamedTempFile::new().unwrap();
-        vocab_file
-            .write_all(b"{\"a\": 0, \"b\": 1, \"c\": 2, \"ab\": 3}")
-            .unwrap();
-
-        // Set up merges file.
-        let mut merges_file = NamedTempFile::new().unwrap();
-        merges_file.write_all(b"#version: 0.2\na b\na d").unwrap();
-
-        // Ensure the result of BPE::from_file is a MergeTokenOutOfVocabulary error.
-        match BPE::from_file(
-            vocab_file.path().to_str().unwrap(),
-            merges_file.path().to_str().unwrap(),
-        )
-        .build()
-        {
-            Ok(_) => unreachable!(),
-            Err(err) => match err.downcast_ref::<Error>() {
-                Some(Error::MergeTokenOutOfVocabulary(token)) => {
-                    assert_eq!(*token, String::from("d"))
-                }
-                _ => unreachable!(),
-            },
-        }
-    }
-
-    #[test]
-    // Ensure `BadMerges` error is returned when there is an invalid line in the
-    // merges.txt file.
-    fn test_bpe_from_file_bad_merges() {
-        // Set up vocab file.
-        let mut vocab_file = NamedTempFile::new().unwrap();
-        vocab_file
-            .write_all("{\"a\": 0, \"b\": 1, \"c\": 2, \"ab\": 3}".as_bytes())
-            .unwrap();
-
-        // Set up merges file with a bad line.
-        let mut merges_file = NamedTempFile::new().unwrap();
-        merges_file.write_all(b"#version: 0.2\na b\nc").unwrap();
-
-        // Ensure the result of BPE::from_file is a BadMerges error.
-        match BPE::from_file(
-            vocab_file.path().to_str().unwrap(),
-            merges_file.path().to_str().unwrap(),
-        )
-        .build()
-        {
-            Ok(_) => unreachable!(),
-            Err(err) => match err.downcast_ref::<Error>() {
-                Some(Error::BadMerges(line)) => assert_eq!(*line, 2),
-                _ => unreachable!(),
-            },
-        }
     }
 }

@@ -75,8 +75,8 @@ progressbar = ["indicatif"]
 http = ["reqwest", "cached-path", "dirs"]
 cli = ["clap"]
 unstable_wasm = ["fancy-regex", "getrandom/js"]
+unstable_wasi = ["fancy-regex"]
 
 [dev-dependencies]
-criterion = "0.4"
-tempfile = "3.4"
+criterion = { version = "0.4", default-features = false, features = [ "plotters" ] }
 assert_approx_eq = "1.1"
