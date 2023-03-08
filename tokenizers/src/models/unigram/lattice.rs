@@ -397,7 +397,11 @@ impl<'a> Lattice<'a> {
             }
         }
 
-        let mut rng = thread_rng();
+        #[cfg(feature = "random")]
+        let mut rng = rand::thread_rng();
+        #[cfg(not(feature = "random"))]
+        let mut rng = rand::rngs::OsRng;
+
         let mut results: Vec<NodeRef> = vec![];
         let mut probs: Vec<f64> = vec![];
         let mut z = alpha[self.eos_node().borrow().node_id];
