@@ -1052,11 +1052,11 @@ where
                     let progress = ProgressBar::new(len);
                     progress.set_style(
                         ProgressStyle::default_bar()
-                            .template("[{elapsed_precise}] {msg:<40!} {wide_bar} {percent:>18!}%"),
+                            .template("[{elapsed_precise}] {msg:<40!} {wide_bar} {percent:>18!}%")
+                            .unwrap(),
                     );
                     progress
-                        .set_message(&format!("Pre-processing files ({:.2} Mo)", len / 1_000_000));
-                    progress.set_draw_delta(len / 100); // Redraw only every 2%
+                        .set_message(format!("Pre-processing files ({:.2} Mo)", len / 1_000_000));
                     Some(progress)
                 } else {
                     None
@@ -1105,15 +1105,10 @@ where
             let progress = ProgressBar::new(len);
             progress.set_style(
                 ProgressStyle::default_bar()
-                    .template("[{elapsed_precise}] {msg:<40!} {wide_bar} {pos:<9!}/{len:>9!}"),
+                    .template("[{elapsed_precise}] {msg:<40!} {wide_bar} {pos:<9!}/{len:>9!}")
+                    .unwrap(),
             );
             progress.set_message("Pre-processing sequences");
-            if len > 0 {
-                progress.set_draw_delta(len / 100); // Redraw only every 2%
-            } else {
-                // Trying to have a good default to avoid progress tracking being the bottleneck
-                progress.set_draw_delta(1000);
-            }
             Some(progress)
         } else {
             None

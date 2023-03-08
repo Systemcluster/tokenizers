@@ -212,7 +212,8 @@ impl BpeTrainer {
             let p = ProgressBar::new(0);
             p.set_style(
                 ProgressStyle::default_bar()
-                    .template("[{elapsed_precise}] {msg:<40!} {wide_bar} {pos:<9!}/{len:>9!}"),
+                    .template("[{elapsed_precise}] {msg:<40!} {wide_bar} {pos:<9!}/{len:>9!}")
+                    .unwrap(),
             );
             Some(p)
         } else {
@@ -232,9 +233,8 @@ impl BpeTrainer {
     /// Update the progress bar with the new provided length and message
     fn update_progress(&self, p: &Option<ProgressBar>, len: usize, message: &str) {
         if let Some(p) = p {
-            p.set_message(message);
+            p.set_message(message.to_string());
             p.set_length(len as u64);
-            p.set_draw_delta(len as u64 / 100);
             p.reset();
         }
     }
