@@ -1004,12 +1004,37 @@ impl PyTokenizer {
     ///     skip_special_tokens (:obj:`bool`, defaults to :obj:`True`):
     ///         Whether the special tokens should be removed from the decoded string
     ///
+    ///     clean_up_tokenization_spaces (:obj:`bool`, defaults to :obj:`False`):
+    ///         Whether or not to clean up the tokenization spaces.
+    ///
+    ///     spaces_between_added_tokens (:obj:`bool`, defaults to :obj:`True`):
+    ///         Whether an extra space (" ") should be prepended to special tokens
+    ///
     /// Returns:
     ///     :obj:`str`: The decoded string
-    #[pyo3(signature = (ids, skip_special_tokens = true))]
-    #[pyo3(text_signature = "(self, ids, skip_special_tokens=True)")]
-    fn decode(&self, ids: Vec<u32>, skip_special_tokens: bool) -> PyResult<String> {
-        ToPyResult(self.tokenizer.decode(ids, skip_special_tokens)).into()
+    #[pyo3(signature = (
+        ids,
+        skip_special_tokens = true,
+        clean_up_tokenization_spaces = false,
+        spaces_between_added_tokens = true
+    ))]
+    #[pyo3(
+        text_signature = "(self, ids, skip_special_tokens=True,clean_up_tokenization_spaces = False, spaces_between_added_tokens=True)"
+    )]
+    fn decode(
+        &self,
+        ids: Vec<u32>,
+        skip_special_tokens: bool,
+        clean_up_tokenization_spaces: bool,
+        spaces_between_added_tokens: bool,
+    ) -> PyResult<String> {
+        ToPyResult(self.tokenizer.decode(
+            ids,
+            skip_special_tokens,
+            clean_up_tokenization_spaces,
+            spaces_between_added_tokens,
+        ))
+        .into()
     }
 
     /// Decode a batch of ids back to their corresponding string
@@ -1021,18 +1046,39 @@ impl PyTokenizer {
     ///     skip_special_tokens (:obj:`bool`, defaults to :obj:`True`):
     ///         Whether the special tokens should be removed from the decoded strings
     ///
+    ///     clean_up_tokenization_spaces (:obj:`bool`, defaults to :obj:`False`):
+    ///         Whether or not to clean up the tokenization spaces.
+    ///
+    ///     spaces_between_added_tokens (:obj:`bool`, defaults to :obj:`True`):
+    ///         Whether an extra space (" ") should be prepended to special tokens
+    ///
     /// Returns:
     ///     :obj:`List[str]`: A list of decoded strings
-    #[pyo3(signature = (sequences, skip_special_tokens = true))]
-    #[pyo3(text_signature = "(self, sequences, skip_special_tokens=True)")]
+    #[pyo3(signature = (
+        sequences
+        skip_special_tokens = true,
+        clean_up_tokenization_spaces = false,
+        spaces_between_added_tokens = true
+    ))]
+    #[pyo3(
+        text_signature = "(self, sequences, skip_special_tokens=True,clean_up_tokenization_spaces = False, spaces_between_added_tokens=True)"
+    )]
     fn decode_batch(
         &self,
         py: Python<'_>,
         sequences: Vec<Vec<u32>>,
         skip_special_tokens: bool,
+        clean_up_tokenization_spaces: bool,
+        spaces_between_added_tokens: bool,
     ) -> PyResult<Vec<String>> {
         py.allow_threads(|| {
-            ToPyResult(self.tokenizer.decode_batch(sequences, skip_special_tokens)).into()
+            ToPyResult(self.tokenizer.decode_batch(
+                sequences,
+                skip_special_tokens,
+                clean_up_tokenization_spaces,
+                spaces_between_added_tokens,
+            ))
+            .into()
         })
     }
 
