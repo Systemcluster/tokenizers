@@ -1,15 +1,18 @@
-use serde::{Deserialize, Deserializer, Serialize};
+#[cfg(feature = "serialize")]
+use serde::Serialize;
+use serde::{Deserialize, Deserializer};
 
 use crate::tokenizer::{Decoder, PreTokenizedString, PreTokenizer, Result, SplitDelimiterBehavior};
 
-#[derive(Debug, Clone, PartialEq, Serialize, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 /// Replaces all the whitespaces by the provided meta character and then
 /// splits on this character
-#[serde(tag = "type")]
+#[cfg_attr(feature = "serialize", serde(tag = "type"))]
 pub struct Metaspace {
     replacement: char,
     pub add_prefix_space: bool,
-    #[serde(skip)]
+    #[cfg_attr(feature = "serialize", serde(skip))]
     str_rep: String,
 }
 
@@ -106,6 +109,7 @@ mod tests {
     use super::*;
     use crate::{OffsetReferential, OffsetType};
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn serialization() {
         let metaspace = Metaspace::new('_', true);

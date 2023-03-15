@@ -1,7 +1,9 @@
 use super::WordPiece;
 use crate::models::bpe::{BpeTrainer, BpeTrainerBuilder, BPE};
 use crate::tokenizer::{AddedToken, Result, Trainer};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use std::collections::HashSet;
 
 /// A `WordPieceTrainerBuilder` can be used to create a `WordPieceTrainer` with a custom
@@ -88,7 +90,8 @@ impl WordPieceTrainerBuilder {
 }
 
 /// Trains a `WordPiece` model.
-#[derive(Default, Deserialize, Serialize)]
+#[derive(Default, Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub struct WordPieceTrainer {
     bpe_trainer: BpeTrainer,
 }

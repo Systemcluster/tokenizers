@@ -6,9 +6,12 @@ pub mod wordlevel;
 pub mod wordpiece;
 
 use std::collections::HashMap;
+#[cfg(feature = "serialize")]
 use std::path::{Path, PathBuf};
 
-use serde::{Deserialize, Serialize, Serializer};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::{Serialize, Serializer};
 
 use crate::models::bpe::{BpeTrainer, BPE};
 use crate::models::unigram::{Unigram, UnigramTrainer};
@@ -18,16 +21,19 @@ use crate::{AddedToken, Model, Result, Token, Trainer};
 
 /// Wraps a vocab mapping (ID -> token) to a struct that will be serialized in order
 /// of token ID, smallest to largest.
+#[cfg(feature = "serialize")]
 struct OrderedVocabIter<'a> {
     vocab_r: &'a HashMap<u32, String>,
 }
 
+#[cfg(feature = "serialize")]
 impl<'a> OrderedVocabIter<'a> {
     fn new(vocab_r: &'a HashMap<u32, String>) -> Self {
         Self { vocab_r }
     }
 }
 
+#[cfg(feature = "serialize")]
 impl<'a> Serialize for OrderedVocabIter<'a> {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where
@@ -51,7 +57,8 @@ impl<'a> Serialize for OrderedVocabIter<'a> {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
+#[derive(Deserialize, Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(untagged)]
 pub enum ModelWrapper {
     BPE(BPE),
@@ -115,6 +122,7 @@ impl Model for ModelWrapper {
         }
     }
 
+    #[cfg(feature = "serialize")]
     fn save(&self, folder: &Path, name: Option<&str>) -> Result<Vec<PathBuf>> {
         match self {
             Self::WordLevel(t) => t.save(folder, name),
@@ -134,7 +142,8 @@ impl Model for ModelWrapper {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub enum TrainerWrapper {
     BpeTrainer(BpeTrainer),
     WordPieceTrainer(WordPieceTrainer),
@@ -208,6 +217,7 @@ mod tests {
         assert!(result.is_err());
     }
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn incomplete_ordered_vocab() {
         let vocab_r: HashMap<u32, String> =

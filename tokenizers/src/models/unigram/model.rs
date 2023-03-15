@@ -9,7 +9,9 @@ use crate::utils::cache::Cache;
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::fs::read_to_string;
-use std::path::{Path, PathBuf};
+use std::path::Path;
+#[cfg(feature = "serialize")]
+use std::path::PathBuf;
 
 type TokenMap = HashMap<String, u32>;
 type Vocab = Vec<(String, f64)>;
@@ -427,6 +429,7 @@ impl Model for Unigram {
         self.vocab.get(id as usize).map(|item| item.0.clone())
     }
 
+    #[cfg(feature = "serialize")]
     fn save(&self, folder: &Path, name: Option<&str>) -> Result<Vec<PathBuf>> {
         let name = match name {
             Some(name) => format!("{}-unigram.json", name),

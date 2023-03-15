@@ -1,15 +1,18 @@
-use super::{super::OrderedVocabIter, trainer::BpeTrainer, Error, Pair, Word};
+#[cfg(feature = "serialize")]
+use super::super::OrderedVocabIter;
+use super::{trainer::BpeTrainer, Error, Pair, Word};
 use crate::tokenizer::{Model, Result, Token};
 use crate::utils::cache::{Cache, DEFAULT_CACHE_CAPACITY};
 use crate::utils::iter::ResultShunt;
 use serde_json::Value;
 use std::borrow::Cow;
+#[cfg(feature = "serialize")]
+use std::path::{Path, PathBuf};
 use std::{
     collections::HashMap,
     fs::File,
     io::prelude::*,
     io::{BufRead, BufReader},
-    path::{Path, PathBuf},
 };
 
 pub type Vocab = HashMap<String, u32>;
@@ -460,6 +463,7 @@ impl Model for BPE {
         self.vocab_r.get(&id).cloned()
     }
 
+    #[cfg(feature = "serialize")]
     fn save(&self, folder: &Path, name: Option<&str>) -> Result<Vec<PathBuf>> {
         let vocab_file_name = match name {
             Some(name) => format!("{}-vocab.json", name),
@@ -513,6 +517,7 @@ impl Model for BPE {
 mod tests {
     use super::*;
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn test_ordered_vocab_iter() {
         let vocab_r: VocabR = [

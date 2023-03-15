@@ -1,11 +1,15 @@
-use super::{super::OrderedVocabIter, convert_merges_to_hashmap, BpeBuilder, Pair, BPE};
+#[cfg(feature = "serialize")]
+use super::{super::OrderedVocabIter, Pair};
+use super::{convert_merges_to_hashmap, BpeBuilder, BPE};
 use serde::{
     de::{Error, MapAccess, Visitor},
-    ser::SerializeStruct,
-    Deserialize, Deserializer, Serialize, Serializer,
+    Deserialize, Deserializer,
 };
+#[cfg(feature = "serialize")]
+use serde::{ser::SerializeStruct, Serialize, Serializer};
 use std::collections::HashMap;
 
+#[cfg(feature = "serialize")]
 impl Serialize for BPE {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

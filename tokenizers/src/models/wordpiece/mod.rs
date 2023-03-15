@@ -7,8 +7,11 @@ use std::{
     borrow::Cow,
     collections::HashMap,
     fs::File,
-    io::prelude::*,
     io::{BufRead, BufReader},
+};
+#[cfg(feature = "serialize")]
+use std::{
+    io::prelude::*,
     path::{Path, PathBuf},
 };
 
@@ -269,6 +272,7 @@ impl Model for WordPiece {
         self.vocab_r.get(&id).cloned()
     }
 
+    #[cfg(feature = "serialize")]
     fn save(&self, folder: &Path, name: Option<&str>) -> Result<Vec<PathBuf>> {
         let vocab_file_name = match name {
             Some(name) => format!("{}-vocab.txt", name),

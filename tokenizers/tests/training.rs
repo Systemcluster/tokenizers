@@ -1,7 +1,9 @@
 use tokenizers::models::bpe::BPE;
 use tokenizers::pre_tokenizers::whitespace::Whitespace;
+#[cfg(feature = "serialize")]
+use tokenizers::Tokenizer;
 use tokenizers::{DecoderWrapper, NormalizerWrapper, PostProcessorWrapper, PreTokenizerWrapper};
-use tokenizers::{Model, Tokenizer, TokenizerBuilder};
+use tokenizers::{Model, TokenizerBuilder};
 
 #[test]
 fn bpe_values_after_training() {
@@ -52,9 +54,11 @@ fn bpe_continuing_subword_prefix_error() {
     tokenizer
         .train_from_files(&mut trainer, vec!["./data/small.txt".to_string()])
         .unwrap();
-    tokenizer.save("tokenizer.json", true).unwrap();
-    let tokenizer = Tokenizer::from_file("tokenizer.json").unwrap();
-    assert_eq!(tokenizer.get_vocab_size(false), 1526);
-
-    std::fs::remove_file("tokenizer.json").unwrap();
+    #[cfg(feature = "serialize")]
+    {
+        tokenizer.save("tokenizer.json", true).unwrap();
+        let tokenizer = Tokenizer::from_file("tokenizer.json").unwrap();
+        assert_eq!(tokenizer.get_vocab_size(false), 1526);
+        std::fs::remove_file("tokenizer.json").unwrap();
+    }
 }

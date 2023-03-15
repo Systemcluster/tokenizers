@@ -1,12 +1,15 @@
 use super::WordLevel;
 use crate::utils::parallelism::*;
 use crate::{AddedToken, Result, Trainer};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
 #[non_exhaustive]
-#[derive(Debug, Clone, Builder, Serialize, Deserialize)]
+#[derive(Debug, Clone, Builder, Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub struct WordLevelTrainer {
     /// The minimum frequency a word must have to be part of the vocabulary
     #[builder(default = "0")]

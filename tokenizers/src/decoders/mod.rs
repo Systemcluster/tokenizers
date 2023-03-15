@@ -7,7 +7,9 @@ pub mod wordpiece;
 pub use super::pre_tokenizers::byte_level;
 pub use super::pre_tokenizers::metaspace;
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::decoders::bpe::BPEDecoder;
 use crate::decoders::ctc::CTC;
@@ -17,7 +19,8 @@ use crate::pre_tokenizers::byte_level::ByteLevel;
 use crate::pre_tokenizers::metaspace::Metaspace;
 use crate::{Decoder, Result};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(untagged)]
 pub enum DecoderWrapper {
     BPE(BPEDecoder),

@@ -12,14 +12,17 @@
 use std::{
     collections::HashMap,
     fs::{read_to_string, File},
-    io::prelude::*,
     io::BufReader,
     ops::{Deref, DerefMut},
-    path::{Path, PathBuf},
+    path::Path,
 };
+#[cfg(feature = "serialize")]
+use std::{io::prelude::*, path::PathBuf};
 
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::utils::iter::ResultShunt;
 use crate::utils::parallelism::*;
@@ -83,6 +86,7 @@ pub trait Model {
     fn get_vocab_size(&self) -> usize;
     /// Save the current `Model` in the given folder, using the given `prefix` for the various
     /// files that need to be saved.
+    #[cfg(feature = "serialize")]
     fn save(&self, folder: &Path, prefix: Option<&str>) -> Result<Vec<PathBuf>>;
     /// Get an instance of a Trainer capable of training this Model
     fn get_trainer(&self) -> <Self as Model>::Trainer;
@@ -399,7 +403,8 @@ where
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub struct Tokenizer(
     TokenizerImpl<
         ModelWrapper,
@@ -1271,6 +1276,7 @@ where
     }
 }
 
+#[cfg(feature = "serialize")]
 impl<M, N, PT, PP, D> TokenizerImpl<M, N, PT, PP, D>
 where
     M: Serialize,

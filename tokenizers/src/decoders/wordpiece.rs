@@ -1,8 +1,11 @@
 use crate::tokenizer::{Decoder, Result};
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
-#[derive(Deserialize, Clone, Debug, Serialize)]
+#[derive(Deserialize, Clone, Debug)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 /// The WordPiece decoder takes care of decoding a list of wordpiece tokens
 /// back into a readable string.
 #[serde(tag = "type")]

@@ -1,7 +1,8 @@
-use tokenizers::models::wordpiece::WordPiece;
-use tokenizers::{AddedToken, Tokenizer};
-
+#[cfg(feature = "serialize")]
 fn main() {
+    use tokenizers::models::wordpiece::WordPiece;
+    use tokenizers::{AddedToken, Tokenizer};
+
     let start = std::time::Instant::now();
     let mut tokenizer = Tokenizer::new(WordPiece::default());
 
@@ -17,4 +18,9 @@ fn main() {
     let _tok = Tokenizer::from_file("_tok.json").unwrap();
     println!("Took {:?}", start.elapsed());
     std::fs::remove_file("_tok.json").unwrap();
+}
+
+#[cfg(not(feature = "serialize"))]
+fn main() {
+    println!("This example requires the `serialize` feature");
 }

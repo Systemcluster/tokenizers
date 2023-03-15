@@ -3,15 +3,18 @@ use std::marker::PhantomData;
 use serde::{
     self,
     de::{Error, MapAccess, Visitor},
-    ser::SerializeStruct,
-    Deserialize, Deserializer, Serialize, Serializer,
+    Deserialize, Deserializer,
 };
+#[cfg(feature = "serialize")]
+use serde::{ser::SerializeStruct, Serialize, Serializer};
 
 use super::{added_vocabulary::AddedTokenWithId, TokenizerImpl};
 use crate::{Decoder, Model, Normalizer, PostProcessor, PreTokenizer, TokenizerBuilder};
 
+#[cfg(feature = "serialize")]
 static SERIALIZATION_VERSION: &str = "1.0";
 
+#[cfg(feature = "serialize")]
 impl<M, N, PT, PP, D> Serialize for TokenizerImpl<M, N, PT, PP, D>
 where
     M: Serialize,
@@ -177,9 +180,12 @@ where
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "serialize")]
     use crate::tokenizer::Tokenizer;
+    #[cfg(feature = "serialize")]
     use std::str::FromStr;
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn test_deserialization_serialization_invariant() {
         let tok_json = r#"{

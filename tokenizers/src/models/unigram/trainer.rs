@@ -3,7 +3,9 @@ use crate::tokenizer::{AddedToken, Result, Trainer};
 use crate::utils::parallelism::*;
 use crate::utils::progress::{ProgressBar, ProgressStyle};
 use log::debug;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 use std::convert::TryInto;
@@ -39,7 +41,8 @@ fn to_log_prob(pieces: &mut [SentencePiece]) {
 
 /// A `UnigramTrainer` can train a `Unigram` model from `word_counts`.
 #[non_exhaustive]
-#[derive(Builder, Debug, Clone, Serialize, Deserialize)]
+#[derive(Builder, Debug, Clone, Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub struct UnigramTrainer {
     #[builder(default = "true")]
     pub show_progress: bool,

@@ -1,6 +1,8 @@
 use crate::tokenizer::{NormalizedString, Normalizer, Result};
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use unicode_categories::UnicodeCategories;
 
 /// Checks whether a character is whitespace
@@ -47,7 +49,8 @@ fn is_chinese_char(c: char) -> bool {
     )
 }
 
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+#[derive(Copy, Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(tag = "type")]
 #[non_exhaustive]
 pub struct BertNormalizer {

@@ -1,10 +1,16 @@
+#[cfg(feature = "serialize")]
 use tokenizers::models::bpe::{BpeTrainerBuilder, BPE};
+#[cfg(feature = "serialize")]
 use tokenizers::normalizers::{Sequence, Strip, NFC};
+#[cfg(feature = "serialize")]
 use tokenizers::pre_tokenizers::byte_level::ByteLevel;
-use tokenizers::{AddedToken, TokenizerBuilder};
+use tokenizers::AddedToken;
+#[cfg(feature = "serialize")]
+use tokenizers::TokenizerBuilder;
 use tokenizers::{DecoderWrapper, NormalizerWrapper, PostProcessorWrapper, PreTokenizerWrapper};
 use tokenizers::{Tokenizer, TokenizerImpl};
 
+#[cfg(feature = "serialize")]
 #[test]
 fn train_tokenizer() {
     let vocab_size: usize = 100;
@@ -105,7 +111,11 @@ fn quicktour_slow_train() -> tokenizers::Result<()> {
     tokenizer.train_from_files(&mut trainer, files)?;
     // END quicktour_train
     // START quicktour_save
-    tokenizer.save("data/tokenizer-wiki.json", false)?;
+
+    #[cfg(feature = "serialize")]
+    {
+        tokenizer.save("data/tokenizer-wiki.json", false)?;
+    }
     // END quicktour_save
 
     Ok(())
@@ -423,7 +433,10 @@ fn train_pipeline_bert() -> tokenizers::Result<()> {
     ];
     bert_tokenizer.train_from_files(&mut trainer, files)?;
 
-    bert_tokenizer.save("data/bert-wiki.json", false)?;
+    #[cfg(feature = "serialize")]
+    {
+        bert_tokenizer.save("data/bert-wiki.json", false)?;
+    }
     // END bert_train_tokenizer
     Ok(())
 }

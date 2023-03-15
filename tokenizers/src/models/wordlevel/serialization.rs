@@ -1,11 +1,15 @@
-use super::{super::OrderedVocabIter, WordLevel, WordLevelBuilder};
+#[cfg(feature = "serialize")]
+use super::super::OrderedVocabIter;
+use super::{WordLevel, WordLevelBuilder};
 use serde::{
     de::{MapAccess, Visitor},
-    ser::SerializeStruct,
-    Deserialize, Deserializer, Serialize, Serializer,
+    Deserialize, Deserializer,
 };
+#[cfg(feature = "serialize")]
+use serde::{ser::SerializeStruct, Serialize, Serializer};
 use std::collections::HashSet;
 
+#[cfg(feature = "serialize")]
 impl Serialize for WordLevel {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -90,7 +94,10 @@ mod tests {
         let wl = WordLevel::default();
         let wl_s = r#"{"type":"WordLevel","vocab":{},"unk_token":"<unk>"}"#;
 
-        assert_eq!(serde_json::to_string(&wl).unwrap(), wl_s);
+        #[cfg(feature = "serialize")]
+        {
+            assert_eq!(serde_json::to_string(&wl).unwrap(), wl_s);
+        }
         assert_eq!(serde_json::from_str::<WordLevel>(wl_s).unwrap(), wl);
     }
 
@@ -106,7 +113,10 @@ mod tests {
             .build()
             .unwrap();
         let wl_s = r#"{"type":"WordLevel","vocab":{"<unk>":0,"b":2},"unk_token":"<unk>"}"#;
-        assert_eq!(serde_json::to_string(&wordlevel).unwrap(), wl_s);
+        #[cfg(feature = "serialize")]
+        {
+            assert_eq!(serde_json::to_string(&wordlevel).unwrap(), wl_s);
+        }
         assert_eq!(serde_json::from_str::<WordLevel>(wl_s).unwrap(), wordlevel);
     }
 

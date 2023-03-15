@@ -1,9 +1,13 @@
+#[cfg(feature = "serialize")]
 use super::OrderedVocabIter;
 use crate::tokenizer::{Model, Result, Token};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{BufReader, Read, Write};
+#[cfg(feature = "serialize")]
+use std::io::Write;
+use std::io::{BufReader, Read};
+#[cfg(feature = "serialize")]
 use std::path::{Path, PathBuf};
 
 mod serialization;
@@ -192,6 +196,7 @@ impl Model for WordLevel {
         self.vocab.keys().len()
     }
 
+    #[cfg(feature = "serialize")]
     fn save(&self, folder: &Path, name: Option<&str>) -> Result<Vec<PathBuf>> {
         let vocab_file_name = match name {
             Some(name) => format!("{}-vocab.json", name),
@@ -203,6 +208,8 @@ impl Model for WordLevel {
             .iter()
             .collect();
         let mut vocab_file = File::create(&vocab_path)?;
+        #[cfg(feature = "serialize")]
+        #[cfg(feature = "serialize")]
         let order_vocab_iter = OrderedVocabIter::new(&self.vocab_r);
         let serialized = serde_json::to_string(&order_vocab_iter)?;
         vocab_file.write_all(serialized.as_bytes())?;

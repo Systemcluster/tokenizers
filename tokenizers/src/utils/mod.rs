@@ -17,9 +17,12 @@ pub mod parallelism;
 pub(crate) mod progress;
 pub mod truncation;
 
+#[cfg(feature = "serialize")]
 use serde::{Serialize, Serializer};
+#[cfg(feature = "serialize")]
 use std::collections::{BTreeMap, HashMap};
 
+#[cfg(feature = "serialize")]
 pub(crate) fn ordered_map<S, K, V>(
     value: &HashMap<K, V>,
     serializer: S,
@@ -131,7 +134,8 @@ macro_rules! impl_serde_type{
     ) => {
         paste::paste!{
             $(#[$meta])*
-            #[derive(Serialize, Deserialize)]
+            #[derive(Deserialize)]
+            #[cfg_attr(feature = "serialize", derive(Serialize))]
             #[serde(tag = "type", from = $struct_name "Deserializer")]
             $vis struct $struct_name{
                 $(
@@ -182,6 +186,7 @@ macro_rules! impl_serde_type{
             $(#[$meta])*
             $vis struct $struct_name;
 
+            #[cfg(feature = "serialize")]
             impl serde::Serialize for $struct_name {
                 fn serialize<S>(&self, serializer: S)  -> std::result::Result<S::Ok, S::Error> where
                     S: serde::ser::Serializer {
@@ -200,12 +205,14 @@ macro_rules! impl_serde_type{
                 }
             }
 
-            #[derive(serde::Serialize, serde::Deserialize)]
+            #[derive(serde::Deserialize)]
+            #[cfg_attr(feature = "serialize", derive(serde::Serialize))]
             enum [<$struct_name Type>] {
                 $struct_name,
             }
 
-            #[derive(serde::Serialize, serde::Deserialize)]
+            #[derive(serde::Deserialize)]
+            #[cfg_attr(feature = "serialize", derive(serde::Serialize))]
             struct [<$struct_name Helper>] {
                 #[allow(dead_code)]
                 r#type: [<$struct_name Type>],

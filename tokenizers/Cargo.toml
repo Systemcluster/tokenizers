@@ -70,7 +70,7 @@ getrandom = { version = "0.2.8" }
 esaxx-rs = { version = "0.1", default-features = false, features=[]}
 
 [features]
-default = ["progressbar", "http", "cli", "onig", "esaxx_fast", "random"]
+default = ["progressbar", "http", "cli", "onig", "esaxx_fast", "random", "serialize"]
 esaxx_fast = ["esaxx-rs/cpp"]
 progressbar = ["indicatif"]
 http = ["reqwest", "cached-path", "dirs"]
@@ -78,6 +78,7 @@ cli = ["clap"]
 unstable_wasm = ["fancy-regex", "getrandom/js"]
 random = ["rand/std", "rand/std_rng"]
 unstable_wasi = ["fancy-regex"]
+serialize = []
 
 [dev-dependencies]
 criterion = { version = "0.4", default-features = false, features = [ "plotters" ] }

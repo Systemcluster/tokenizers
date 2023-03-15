@@ -1,3 +1,5 @@
+#![cfg(feature = "serialize")]
+
 mod common;
 
 use common::*;

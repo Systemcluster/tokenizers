@@ -12,12 +12,15 @@ pub use crate::normalizers::strip::{Strip, StripAccents};
 pub use crate::normalizers::unicode::{Nmt, NFC, NFD, NFKC, NFKD};
 pub use crate::normalizers::utils::{Lowercase, Sequence};
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{NormalizedString, Normalizer};
 
 /// Wrapper for known Normalizers.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(untagged)]
 pub enum NormalizerWrapper {
     BertNormalizer(BertNormalizer),

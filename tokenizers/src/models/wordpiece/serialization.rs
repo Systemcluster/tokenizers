@@ -1,11 +1,15 @@
-use super::{super::OrderedVocabIter, WordPiece, WordPieceBuilder};
+#[cfg(feature = "serialize")]
+use super::super::OrderedVocabIter;
+use super::{WordPiece, WordPieceBuilder};
 use serde::{
     de::{MapAccess, Visitor},
-    ser::SerializeStruct,
-    Deserialize, Deserializer, Serialize, Serializer,
+    Deserialize, Deserializer,
 };
+#[cfg(feature = "serialize")]
+use serde::{ser::SerializeStruct, Serialize, Serializer};
 use std::collections::HashSet;
 
+#[cfg(feature = "serialize")]
 impl Serialize for WordPiece {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -118,7 +122,10 @@ mod tests {
             \"vocab\":{}\
         }";
 
-        assert_eq!(serde_json::to_string(&wp).unwrap(), wp_s);
+        #[cfg(feature = "serialize")]
+        {
+            assert_eq!(serde_json::to_string(&wp).unwrap(), wp_s);
+        }
         assert_eq!(serde_json::from_str::<WordPiece>(wp_s).unwrap(), wp);
     }
 

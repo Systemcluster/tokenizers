@@ -1,10 +1,13 @@
 use crate::processors::byte_level::process_offsets;
 use crate::tokenizer::{Encoding, PostProcessor, Result};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use std::collections::HashMap;
 use std::iter::FromIterator;
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(tag = "type")]
 pub struct RobertaProcessing {
     sep: (String, u32),
@@ -228,6 +231,7 @@ impl PostProcessor for RobertaProcessing {
 mod tests {
     use super::*;
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn serde() {
         let roberta = RobertaProcessing::default();

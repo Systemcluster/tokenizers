@@ -1,7 +1,9 @@
 use crate::pre_tokenizers::PreTokenizerWrapper;
 use crate::tokenizer::{PreTokenizedString, PreTokenizer, Result};
 use crate::utils::macro_rules_attribute;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 #[derive(Clone, Debug, PartialEq)]
 #[macro_rules_attribute(impl_serde_type!)]

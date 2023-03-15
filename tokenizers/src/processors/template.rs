@@ -57,13 +57,16 @@
 //!
 use crate::{Encoding, PostProcessor, Result};
 use itertools::Itertools;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use std::collections::{HashMap, HashSet};
 use std::convert::{TryFrom, TryInto};
 use std::result::Result as StdResult;
 
 /// Represents any sequences received as input of the PostProcessor
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Eq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub enum Sequence {
     /// This is the first sequence, the one that is always specified
     A,
@@ -91,7 +94,8 @@ pub enum Sequence {
 ///
 /// [`SpecialToken`]: struct.SpecialToken.html
 ///
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Eq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub enum Piece {
     Sequence { id: Sequence, type_id: u32 },
     SpecialToken { id: String, type_id: u32 },
@@ -188,7 +192,8 @@ impl TryFrom<&str> for Piece {
 ///     vec!["A".into(), "complex".into(), "special".into(), "token".into(), ":".into()]
 /// ).unwrap();
 /// ```
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Eq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub struct SpecialToken {
     /// A unique id used to identify this SpecialToken in the template
     id: String,
@@ -249,7 +254,8 @@ impl SpecialToken {
 ///
 /// [`Piece`]: enum.Piece.html
 ///
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Eq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(transparent)]
 pub struct Template(Vec<Piece>);
 
@@ -289,7 +295,8 @@ impl TryFrom<&str> for Template {
 /// from a HashMap or a Vec<[`SpecialToken`]>.
 ///
 /// [`SpecialToken`]: struct.SpecialToken.html
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, Eq)]
+#[derive(Debug, Clone, PartialEq, Default, Deserialize, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(transparent)]
 pub struct Tokens(
     #[serde(serialize_with = "crate::utils::ordered_map")] pub HashMap<String, SpecialToken>,
@@ -332,7 +339,8 @@ impl From<HashMap<String, SpecialToken>> for Tokens {
 ///     .unwrap();
 /// ```
 ///
-#[derive(Debug, Clone, PartialEq, Builder, Serialize, Deserialize, Eq)]
+#[derive(Debug, Clone, PartialEq, Builder, Deserialize, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(tag = "type", from = "TemplateProcessingDeserializer")]
 #[builder(build_fn(validate = "Self::validate"))]
 pub struct TemplateProcessing {
@@ -638,6 +646,7 @@ mod tests {
     use std::convert::TryInto;
     use std::iter::FromIterator;
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn piece_serde() {
         let seq_0 = Piece::Sequence {
@@ -707,6 +716,7 @@ mod tests {
         assert!(Piece::try_from("$A:").is_err());
     }
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn special_token_serde() {
         let simple = SpecialToken::from(("[CLS]", 0));
@@ -744,6 +754,7 @@ mod tests {
         assert!(malformed.is_err());
     }
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn template_serde() {
         let template = Template(vec![
@@ -765,6 +776,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn tokens_serde() {
         let tokens = Tokens::from(vec![("[CLS]", 1), ("[SEP]", 0)]);
@@ -785,6 +797,7 @@ mod tests {
             .unwrap()
     }
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn template_processing_serde() {
         let template = tests::get_bert_template();

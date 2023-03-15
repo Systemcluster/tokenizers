@@ -1,12 +1,15 @@
 use crate::utils::SysRegex;
-use serde::{Deserialize, Deserializer, Serialize};
+#[cfg(feature = "serialize")]
+use serde::Serialize;
+use serde::{Deserialize, Deserializer};
 
 use crate::tokenizer::{
     pattern::Invert, PreTokenizedString, PreTokenizer, Result, SplitDelimiterBehavior,
 };
 
 /// Represents the different patterns that `Split` can use
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Eq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub enum SplitPattern {
     String(String),
     Regex(String),
@@ -24,11 +27,12 @@ impl From<&str> for SplitPattern {
     }
 }
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "type")]
+#[derive(Debug)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "serialize", serde(tag = "type"))]
 pub struct Split {
     pattern: SplitPattern,
-    #[serde(skip)]
+    #[cfg_attr(feature = "serialize", serde(skip))]
     regex: SysRegex,
     behavior: SplitDelimiterBehavior,
     invert: bool,
@@ -234,6 +238,7 @@ mod tests {
         assert_eq!(pretok_str, pretok_str_for_invert);
     }
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn serialization() {
         use SplitDelimiterBehavior::*;

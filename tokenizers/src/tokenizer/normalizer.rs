@@ -3,7 +3,9 @@ use crate::{Offsets, Result};
 use std::ops::{Bound, RangeBounds};
 use unicode_normalization_alignments::UnicodeNormalization;
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 /// Add or Substract a signed isize on a usize. Makes sure of avoiding
 /// any substraction overflow, flooring at 0.
@@ -91,7 +93,8 @@ where
 ///  - MergedWithPrevious => `[ "the-", "final-", "-", "countdown" ]`
 ///  - MergedWithNext => `[ "the", "-final", "-", "-countdown" ]`
 ///  - Contiguous => `[ "the", "-", "final", "--", "countdown" ]`
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub enum SplitDelimiterBehavior {
     Removed,
     Isolated,

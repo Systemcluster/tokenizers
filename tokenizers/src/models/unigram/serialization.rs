@@ -1,10 +1,12 @@
 use super::model::Unigram;
 use serde::{
     de::{Error, MapAccess, Visitor},
-    ser::SerializeStruct,
-    Deserialize, Deserializer, Serialize, Serializer,
+    Deserialize, Deserializer,
 };
+#[cfg(feature = "serialize")]
+use serde::{ser::SerializeStruct, Serialize, Serializer};
 
+#[cfg(feature = "serialize")]
 impl Serialize for Unigram {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -71,8 +73,10 @@ impl<'de> Visitor<'de> for UnigramVisitor {
 
 #[cfg(test)]
 mod test {
+    #[cfg(feature = "serialize")]
     use super::*;
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn test_serialization() {
         let vocab = vec![("<unk>".to_string(), 0.0), ("a".to_string(), -0.5)];
@@ -84,6 +88,7 @@ mod test {
         assert_eq!(model, reconstructed);
     }
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn test_serialization_unk_id_not_zero() {
         let vocab = vec![("a".to_string(), -0.5), ("<unk>".to_string(), 0.0)];
@@ -95,6 +100,7 @@ mod test {
         assert_eq!(model, reconstructed);
     }
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn test_serialization_no_unk_id() {
         let vocab = vec![("a".to_string(), -0.5)];

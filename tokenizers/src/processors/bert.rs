@@ -1,9 +1,12 @@
 use crate::tokenizer::{Encoding, PostProcessor, Result};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use std::collections::HashMap;
 use std::iter::FromIterator;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Deserialize, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(tag = "type")]
 pub struct BertProcessing {
     sep: (String, u32),
@@ -185,6 +188,7 @@ impl PostProcessor for BertProcessing {
 mod tests {
     use super::*;
 
+    #[cfg(feature = "serialize")]
     #[test]
     fn serde() {
         let bert = BertProcessing::default();

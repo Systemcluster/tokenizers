@@ -1,9 +1,12 @@
 use crate::tokenizer::{NormalizedString, Normalizer, Result};
 use crate::utils::macro_rules_attribute;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use unicode_normalization_alignments::char::is_combining_mark;
 
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+#[derive(Copy, Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 #[serde(tag = "type")]
 #[non_exhaustive]
 pub struct Strip {

@@ -1,7 +1,9 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::utils::SysRegex;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::tokenizer::{
     Decoder, Encoding, PostProcessor, PreTokenizedString, PreTokenizer, Result,

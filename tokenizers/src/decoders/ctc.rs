@@ -2,9 +2,12 @@ use crate::decoders::wordpiece;
 use crate::tokenizer::{Decoder, Result};
 
 use itertools::Itertools;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 /// The CTC (Connectionist Temporal Classification) decoder takes care
 /// of sanitizing a list of inputs token.
 /// Due to some alignement problem the output of some models can come

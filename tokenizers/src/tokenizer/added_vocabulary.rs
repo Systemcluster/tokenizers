@@ -3,7 +3,9 @@ use super::{
 };
 use aho_corasick::{AhoCorasick, AhoCorasickBuilder, MatchKind};
 use regex::Regex;
-use serde::{ser::SerializeSeq, Deserialize, Serialize, Serializer};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::{ser::SerializeSeq, Serialize, Serializer};
 use std::collections::{HashMap, HashSet};
 
 /// Represent a token added by the user on top of the existing Model vocabulary.
@@ -11,7 +13,8 @@ use std::collections::{HashMap, HashSet};
 /// like:
 ///   - Whether they should only match single words
 ///   - Whether to include any whitespace on its left or right
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub struct AddedToken {
     /// The content of the added token
     pub content: String,
@@ -256,7 +259,7 @@ impl AddedVocabulary {
                 continue;
             }
 
-            let id = if let Some(id) = self.token_to_id(&token.content, model) {
+            let id = if let Some(id) = AddedVocabulary::token_to_id(&self, &token.content, model) {
                 ignored += 1;
                 id
             } else {
@@ -296,7 +299,7 @@ impl AddedVocabulary {
             .map(|token| {
                 (
                     token,
-                    self.token_to_id(&token.content, model)
+                    AddedVocabulary::token_to_id(&self, &token.content, model)
                         .expect("Missing additional token"),
                 )
             })
@@ -435,7 +438,8 @@ impl AddedVocabulary {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub(super) struct AddedTokenWithId {
     /// The id assigned to this token
     pub id: u32,
@@ -444,6 +448,7 @@ pub(super) struct AddedTokenWithId {
     pub token: AddedToken,
 }
 
+#[cfg(feature = "serialize")]
 impl Serialize for AddedVocabulary {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -475,9 +480,11 @@ mod tests {
     use crate::normalizers::utils::Lowercase;
     use crate::normalizers::NormalizerWrapper;
     use crate::{OffsetReferential, OffsetType, Result, Token, Trainer};
+    #[cfg(feature = "serialize")]
     use std::path::{Path, PathBuf};
 
-    #[derive(Serialize, Deserialize)]
+    #[derive(Deserialize)]
+    #[cfg_attr(feature = "serialize", derive(Serialize))]
     struct ModelMock {
         vocab: HashMap<String, u32>,
         vocab_r: HashMap<u32, String>,
@@ -553,6 +560,7 @@ mod tests {
         fn get_vocab_size(&self) -> usize {
             self.vocab.len()
         }
+        #[cfg(feature = "serialize")]
         fn save(&self, _folder: &Path, _name: Option<&str>) -> Result<Vec<PathBuf>> {
             unimplemented!()
         }

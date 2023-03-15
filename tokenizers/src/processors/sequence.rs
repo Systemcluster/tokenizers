@@ -1,7 +1,9 @@
 use crate::processors::PostProcessorWrapper;
 use crate::tokenizer::{Encoding, PostProcessor, Result};
 use crate::utils::macro_rules_attribute;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[macro_rules_attribute(impl_serde_type!)]
