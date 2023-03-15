@@ -1,7 +1,7 @@
 use crate::pattern::Pattern;
 use crate::{Offsets, Result};
 use std::ops::{Bound, RangeBounds};
-use unicode_normalization_alignments::UnicodeNormalization;
+use unicode_normalization::UnicodeNormalizationAlignment;
 
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
