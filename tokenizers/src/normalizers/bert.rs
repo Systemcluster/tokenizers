@@ -3,7 +3,9 @@ use crate::tokenizer::{NormalizedString, Normalizer, Result};
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
-use unicode_categories::UnicodeCategories;
+use unicode_properties::GeneralCategory;
+use unicode_properties::GeneralCategoryGroup;
+use unicode_properties::UnicodeGeneralCategory;
 
 /// Checks whether a character is whitespace
 fn is_whitespace(c: char) -> bool {
@@ -22,7 +24,7 @@ fn is_control(c: char) -> bool {
         // The definition of `is_control` here is quite large and contains also
         // Cc, Cf, Cn or Co
         // cf. https://unicode.org/reports/tr44/ (Table 12)
-        _ => c.is_other(),
+        _ => c.general_category_group() == GeneralCategoryGroup::Other,
     }
 }
 
@@ -111,7 +113,9 @@ impl BertNormalizer {
     }
 
     fn do_strip_accents(&self, normalized: &mut NormalizedString) {
-        normalized.nfd().filter(|c| !c.is_mark_nonspacing());
+        normalized
+            .nfd()
+            .filter(|c| c.general_category() != GeneralCategory::MarkNonspacing);
     }
 
     fn do_lowercase(&self, normalized: &mut NormalizedString) {

@@ -1,9 +1,11 @@
 use crate::tokenizer::{PreTokenizedString, PreTokenizer, Result, SplitDelimiterBehavior};
 use crate::utils::macro_rules_attribute;
-use unicode_categories::UnicodeCategories;
+use unicode_properties::GeneralCategoryGroup;
+use unicode_properties::UnicodeGeneralCategory;
 
 fn is_bert_punc(x: char) -> bool {
-    char::is_ascii_punctuation(&x) || x.is_punctuation()
+    char::is_ascii_punctuation(&x)
+        || x.general_category_group() == GeneralCategoryGroup::Punctuation
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]

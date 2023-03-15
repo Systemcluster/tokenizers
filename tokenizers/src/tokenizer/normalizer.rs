@@ -948,7 +948,8 @@ impl From<&str> for NormalizedString {
 mod tests {
     use super::*;
     use regex::Regex;
-    use unicode_categories::UnicodeCategories;
+    use unicode_properties::GeneralCategory;
+    use unicode_properties::UnicodeGeneralCategory;
 
     #[test]
     fn nfd_adds_new_chars() {
@@ -989,7 +990,8 @@ mod tests {
     #[test]
     fn remove_chars_added_by_nfd() {
         let mut n = NormalizedString::from("élégant");
-        n.nfd().filter(|c| !c.is_mark_nonspacing());
+        n.nfd()
+            .filter(|c| c.general_category() != GeneralCategory::MarkNonspacing);
 
         assert_eq!(n.get(), "elegant");
 
@@ -1051,7 +1053,8 @@ mod tests {
     #[test]
     fn mixed_addition_and_removal() {
         let mut n = NormalizedString::from("élégant");
-        n.nfd().filter(|c| !c.is_mark_nonspacing() && c != 'n');
+        n.nfd()
+            .filter(|c| c.general_category() != GeneralCategory::MarkNonspacing && c != 'n');
         assert_eq!(n.get(), "elegat");
         assert_eq!(
             &n.alignments,

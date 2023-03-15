@@ -51,7 +51,7 @@ serde = { version = "1.0", default-features = false, features = [ "alloc", "deri
 serde_json = "1.0"
 clap = { version = "4.1", features=["derive"], optional = true }
 unicode-normalization = { git="https://github.com/Systemcluster/unicode-normalization" }
-unicode_categories = "0.1"
+unicode-properties = { git="https://github.com/unicode-rs/unicode-properties", default-features = false, features = ["general-category"] }
 unicode-segmentation = "1.10"
 indicatif = {version = "0.17", optional = true}
 itertools = "0.10"
